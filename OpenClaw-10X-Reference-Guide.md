@@ -226,8 +226,9 @@ Book 30-60 meetings/month via multi-channel outreach. 200 prospects/day across e
 ### Integration Stack
 - **Email**: Smartlead MCP (116+ tools) — campaigns, warmup, analytics
 - **Prospecting**: Airtop AI MCP — LinkedIn, Facebook, Instagram browser automation
-- **Phone**: Retell AI MCP (60+ tools) — voice agent, transcription, objection handling
-- **Messaging**: Sendblue API — iMessage (blue bubbles, read receipts), SMS/RCS fallback
+- **Phone + Outbound SMS**: CallHub API — voice broadcasting, peer-to-peer texting, toll-free/800 numbers, DNC management
+- **AI Voice**: Retell AI MCP (60+ tools) — voice agent, transcription, objection handling
+- **Inbound Replies**: Sendblue API — iMessage (blue bubbles, read receipts), conversational threading
 - **CRM**: GoHighLevel MCP (269+ tools) — pipeline, contacts, unified inbox
 - **Integration Layer**: Composio MCP (982+ tools) — calendar booking, CRM sync, WhatsApp, Slack, enrichment
 
@@ -252,26 +253,25 @@ Book 30-60 meetings/month via multi-channel outreach. 200 prospects/day across e
 - Composio: Gmail/Outlook for direct replies, Google Calendar/Calendly for meeting links
 - Cron: 8 AM ET (first touch), 10 AM (follow-ups)
 
-**3. Phone SDR** (Retell AI voice agent)
+**3. Phone SDR** (CallHub + Retell AI voice agent)
 - **Only calls A-leads** — highest ROI for expensive phone channel
+- **Outbound via CallHub**: Voice broadcasting, call center, toll-free/800 numbers, DNC management
+- **AI voice via Retell AI**: Real-time speech recognition + LLM + voice synthesis for AI conversations
 - **Speed-to-lead trigger**: When Smartlead reports an A-lead opened email, Phone SDR calls within 5 minutes (10x higher connect rate vs next-day calls)
 - **Re-engagement trigger**: If a cold prospect (14+ days no response) suddenly opens an old email, they re-enter as A-lead with immediate call
-- Retell AI MCP (60+ tools) for call management, transcription, real-time objection handling
 - Composio: Google Calendar/Calendly for booking meetings mid-call
 - **A/B tests**: 2 opening scripts per day
-- Compliance: no calls before 8 AM or after 9 PM prospect local time
+- Compliance: no calls before 8 AM or after 9 PM prospect local time, CallHub DNC enforcement
 - Cron: 10 AM - 12 PM ET + event-driven triggers
 
-**4. Text SDR** (Sonnet + Sendblue API)
-- **iMessage first**: Sendblue detects if prospect has iMessage via `evaluate-service` endpoint
-- iPhone prospects → iMessage (blue bubbles, read receipts, typing indicators, tapback reactions) — ~90% open rate
-- Android prospects → SMS/RCS fallback via same Sendblue API
+**4. Text SDR** (Sonnet — CallHub outbound + Sendblue inbound)
+- **Outbound SMS via CallHub**: Peer-to-peer texting campaigns, toll-free/800 numbers
+- **Inbound replies via Sendblue**: iMessage blue bubbles, read receipts, typing indicators, tapback reactions
 - Follow-ups to A+B leads who haven't replied to email (Day 3, Day 7)
 - **A/B tests**: 2 message tones per batch (casual vs professional)
-- Track iMessage vs SMS performance separately
-- Conversational replies — routes engaged prospects to Phone SDR
+- Conversational replies handled via Sendblue — routes engaged prospects to Phone SDR
 - Tapback reactions (love/like) treated as warm engagement signals
-- Handles STOP/opt-out automatically
+- STOP/opt-out: immediately add to CallHub DNC + update GHL CRM
 - All activity logged to GoHighLevel CRM
 - Cron: 12 PM ET daily
 
@@ -319,8 +319,9 @@ Every Friday at 6 PM:
 |------|---------|
 | Orgo VM (SDR agents) | $37 |
 | Smartlead (email campaigns) | ~$39-94 |
-| Retell AI (voice calls, ~500 min) | ~$35-65 |
-| Sendblue (iMessage/SMS, ~2K messages) | ~$50-100 |
+| CallHub (outbound calls + SMS) | ~$50-100 |
+| Retell AI (AI voice agent) | ~$35-65 |
+| Sendblue (inbound reply handling) | ~$25-50 |
 | GoHighLevel (CRM + pipeline) | ~$97 |
 | Apollo/Apify (lead data + verification) | ~$50 |
 | Composio (integration layer) | Free tier / ~$29+ |
@@ -339,9 +340,9 @@ Prospector → leads/today.json (A/B/C scored + verified) → GHL CRM
     ↓         (Airtop AI: LinkedIn/FB/IG + Apollo enrichment)
 Email SDR → sequences/email/{id}.json → Smartlead MCP (A/B test variants) → GHL CRM
     ↓ (opens/clicks → trigger Phone SDR immediately for A-leads)
-Phone SDR → calls/YYYY-MM-DD/{id}.json → Retell AI (A-leads only) → GHL CRM
+Phone SDR → calls/YYYY-MM-DD/{id}.json → CallHub + Retell AI (A-leads only) → GHL CRM
     ↓ (non-responders)
-Text SDR → sms/YYYY-MM-DD/{id}.json → Sendblue (iMessage/SMS/RCS, A+B leads) → GHL CRM
+Text SDR → sms/YYYY-MM-DD/{id}.json → CallHub outbound + Sendblue inbound (A+B leads) → GHL CRM
     ↓
 Sequence Manager → GHL CRM (pipeline) → Slack #sdr (reports) → DM Justin (hot leads)
     ↓ (weekly)
@@ -360,8 +361,9 @@ Self-Improvement Loop → improvements/week-{N}.md → updates all SOUL.md files
 |-----------|-----------------|
 | [Smartlead MCP](https://github.com/LeadMagic/smartlead-mcp-server) | 116+ tools — email campaigns, warmup, analytics |
 | [Airtop AI MCP](https://github.com/alecf/airtop-mcp) | Browser automation for LinkedIn/FB/IG prospecting |
-| [Retell AI MCP](https://github.com/sunnysingh100/retell-mcp-server) | 60+ tools — voice agent, transcription, objection handling |
-| [Sendblue API](https://docs.sendblue.com/api-v2) | iMessage + SMS + RCS — blue bubbles, read receipts |
+| [CallHub API](https://developer.callhub.io/) | Outbound calls + SMS — voice broadcasting, peer-to-peer texting, 800 numbers, DNC |
+| [Retell AI MCP](https://github.com/sunnysingh100/retell-mcp-server) | 60+ tools — AI voice agent, transcription, objection handling |
+| [Sendblue API](https://docs.sendblue.com/api-v2) | Inbound replies — iMessage blue bubbles, read receipts, conversational threading |
 | [GoHighLevel MCP](https://github.com/mastanley13/GoHighLevel-MCP) | 269+ tools — CRM, pipeline, unified inbox |
 | [Composio](https://composio.dev) | 982+ tools — calendar, CRM, messaging, enrichment |
 | `awesome-openclaw-agents` | SDR Outbound + Objection Handler + Pipeline Manager templates |
@@ -371,11 +373,12 @@ Self-Improvement Loop → improvements/week-{N}.md → updates all SOUL.md files
 - [ ] Day 1: Spin up Orgo VM "sdr-team" (8GB RAM), install OpenClaw
 - [ ] Day 1: Clone SDR repo (`jbellsolutions/openclaw-sdr-agent`), choose v1 or v2
 - [ ] Day 2: Configure SOUL.md per agent (ICP definition, tone, call hours, A/B test params)
-- [ ] Day 2: Set up Smartlead MCP, Retell AI MCP, Airtop AI MCP
-- [ ] Day 2: Set up Sendblue API (v2), GoHighLevel MCP (v2), Composio
+- [ ] Day 2: Set up Smartlead MCP, Airtop AI MCP, Retell AI MCP
+- [ ] Day 2: Set up CallHub API (outbound calls + SMS), Sendblue API (inbound replies)
+- [ ] Day 2: Set up GoHighLevel MCP (v2), Composio
 - [ ] Day 3: Set up email verification (Apify actor), create workspace directories
 - [ ] Day 3: Configure cron schedules, set up Smartlead webhook for speed-to-lead
-- [ ] Day 3: Test Sendblue — verify iMessage detection + SMS fallback with test numbers
+- [ ] Day 3: Test CallHub outbound SMS + Sendblue inbound with test numbers
 - [ ] Day 4-5: Test with 10 A-leads → validate full pipeline end-to-end
 - [ ] Day 6-7: Run 50/day for validation → measure conversion rates per tier
 - [ ] Week 2: Scale to 200/day, self-improvement loop kicks in
@@ -388,5 +391,5 @@ Self-Improvement Loop → improvements/week-{N}.md → updates all SOUL.md files
 4. **CRM data layer** makes SDR output visible to Co-Founder, CFO, and GTM agents
 5. **Daily A/B testing** compounds into the weekly Karpathy loop for continuous improvement
 6. **Human handoff protocol** prevents the AI from fumbling warm prospects — Justin closes
-7. **iMessage via Sendblue** — blue bubbles + read receipts = ~90% open rate vs ~20% SMS
+7. **CallHub outbound + Sendblue inbound** — outbound SMS via CallHub with 800 numbers, inbound iMessage replies via Sendblue with read receipts
 8. **Composio integration layer** — 982+ tools accessible to all agents via MCP
